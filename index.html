@@ -176,8 +176,9 @@
                 <p style="font-size:14px;">Acc: 072200170040756<br>Name: Sachi foods</p>
             </div>
             <div id="qrInfo" style="display:none;">
-                <img src=https://ibb.co/21sqHtnN" class="qr-img">
+                <img src="https://i.ibb.co/YFy2wkRZ/IMG-20260121-WA0000.jpg" class="qr-img">
             </div>
+            <label style="margin-top:10px;">ගෙවූ Slip පත අප්ලෝඩ් කරන්න</label>
             <input type="file" id="slipInput" accept="image/*" onchange="preview(event)">
             <img id="previewImg">
         </div>
@@ -198,7 +199,7 @@
         </div>
         <h2 style="color: var(--primary); margin-top:20px;">ඇණවුම සාර්ථකයි!</h2>
         <p>විස්තර WhatsApp හරහා යවන ලදී.</p>
-        <button class="btn btn-dark" onclick="location.reload()">Back to Home</button>
+        <button class="btn btn-dark" onclick="location.reload()">මුලට යන්න</button>
     </div>
 </div>
 
@@ -218,7 +219,7 @@
             document.getElementById('lockOverlay').style.display = "none"; 
             document.getElementById('mainApp').style.opacity = "1"; 
             document.getElementById('mainApp').style.pointerEvents = "auto"; 
-        } else { alert("වැරදි PIN அංකයක්!"); } 
+        } else { alert("වැරදි PIN අංකයක්!"); } 
     }
 
     function updateQty(val) { 
@@ -252,10 +253,12 @@
             document.getElementById('address').value = `📍 GPS: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
             btn.innerText = "✅ Location Linked";
             btn.style.background = "#27ae60";
+        }, (err) => {
+            alert("Location ලබාගත නොහැක.");
+            btn.innerText = "📍 Get My Location";
         });
     }
 
-    // රයිඩර් සෙවීමේ ඇනිමේෂන් එක
     function startRiderSearch() {
         let name = document.getElementById('name').value;
         let phone = document.getElementById('phone').value;
@@ -264,13 +267,11 @@
         document.getElementById('formFields').style.display = 'none';
         document.getElementById('riderLoader').style.display = 'block';
 
-        // තත්පර 3කට පසු රයිඩර් කෙනෙක් තෝරා පෙන්වීම
         setTimeout(() => {
             selectedRider = riders[Math.floor(Math.random() * riders.length)];
             document.getElementById('assignedRider').innerText = "Rider: " + selectedRider;
             document.getElementById('riderLoader').style.display = 'none';
             document.getElementById('doneSection').style.display = 'block';
-            
             sendToWhatsApp();
         }, 3500);
     }
@@ -289,5 +290,4 @@
 </script>
 
 </body>
-
 </html>
