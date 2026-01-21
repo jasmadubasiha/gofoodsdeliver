@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Poppins', 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1d2b64 0%, #f8ff00 100%); /* Premium Gradient Background */
+            background: linear-gradient(135deg, #1d2b64 0%, #f8ff00 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -23,19 +23,17 @@
             margin: 0;
         }
 
-        /* Animations */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
-        /* Overlay Styles */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
@@ -49,10 +47,6 @@
             animation: fadeInUp 0.5s ease-out;
         }
 
-        .modal-box h2 { color: var(--dark); margin: 0; font-size: 26px; }
-        .pin-icon { font-size: 50px; margin: 15px 0; display: block; animation: pulse 2s infinite; }
-
-        /* Container Styles */
         .container {
             background: var(--glass);
             padding: 40px; border-radius: 30px;
@@ -71,9 +65,6 @@
             margin-top: 8px; font-size: 15px; transition: 0.3s; box-sizing: border-box;
         }
 
-        input:focus { border-color: var(--primary); outline: none; background: #f9fff9; }
-
-        /* Buttons */
         .btn {
             width: 100%; padding: 16px; border: none; border-radius: 15px;
             font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s;
@@ -85,9 +76,6 @@
         .btn-dark { background: #2c3e50; }
         .btn-whatsapp { background: #25D366; }
 
-        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
-
-        /* Quantity & Price */
         .qty-row { display: flex; align-items: center; justify-content: space-between; background: #f0f0f0; padding: 10px 20px; border-radius: 15px; margin-top: 10px; }
         .qty-btn { background: var(--primary); color: white; border: none; width: 35px; height: 35px; border-radius: 10px; font-size: 20px; cursor: pointer; }
         
@@ -97,10 +85,14 @@
             font-size: 24px; font-weight: 600; margin-top: 30px; border: 2px solid var(--primary);
         }
 
-        /* Payment Section */
         #paymentDetails { display: none; margin-top: 20px; padding: 20px; background: #fff; border: 1px dashed var(--primary); border-radius: 15px; text-align: center; }
         .qr-img { width: 100%; max-width: 200px; border-radius: 15px; margin: 10px 0; }
         #previewImg { width: 100%; border-radius: 15px; margin-top: 10px; display: none; }
+
+        /* Rider Animation Styles */
+        #riderLoader { display: none; }
+        .searching-text { font-size: 18px; color: var(--primary); font-weight: 600; animation: pulse 1.5s infinite; margin-top: 15px; }
+        .rider-found { background: #e8f5e9; padding: 15px; border-radius: 15px; margin-top: 15px; border: 1px solid var(--primary); }
 
         #mainApp { opacity: 0; pointer-events: none; transition: 0.5s; }
     </style>
@@ -110,9 +102,9 @@
 <div id="noticeOverlay" class="overlay">
     <div class="modal-box">
         <h2>GoFoods Deliver</h2>
-        <span class="pin-icon">📍</span>
-        <h3 style="margin: 10px 0;">සේවා ප්‍රදේශයන්</h3>
-        <p style="color: #666; font-size: 14px; line-height: 1.6;">අම්බලන්තොට, මාමඩල, නෝනගම, හැඩවින්න, බරවකුඹුක, බැමිනියන්විල ප්‍රදේශවලට පමණක් ඇනවුම් බාරගනු ලැබේ.</p>
+        <span style="font-size: 50px; display:block; margin:15px 0;">📍</span>
+        <h3>සේවා ප්‍රදේශයන්</h3>
+        <p style="color: #666; font-size: 14px;">අම්බලන්තොට, මාමඩල, නෝනගම, හැඩවින්න, බරවකුඹුක, බැමිනියන්විල ප්‍රදේශවලට පමණක් ඇනවුම් බාරගනු ලැබේ.</p>
         <button class="btn btn-green" onclick="closeNotice()">පිළිගන්නවා (OK)</button>
     </div>
 </div>
@@ -122,8 +114,7 @@
         <h2>GoFoods Deliver</h2>
         <p style="color: #888; font-size: 13px;">සේවාව Unlock කිරීමට PIN අංකය ඇතුළත් කරන්න.</p>
         <a href="https://wa.me/94776885969?text=Pin%20number" target="_blank" class="btn btn-whatsapp">📩 Get PIN via WhatsApp</a>
-        <a href="tel:+94776885969" class="btn btn-dark">📞 Call for PIN</a>
-        <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eee;">
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
         <input type="password" id="entryPin" placeholder="••••" style="text-align: center; font-size: 24px; letter-spacing: 10px;">
         <button class="btn btn-green" onclick="unlockSite()">Unlock Now</button>
     </div>
@@ -170,12 +161,6 @@
             <option value="350">බැමිනියන්විල (350)</option>
         </select>
 
-        <label>අවශ්‍ය වේලාව</label>
-        <input type="time" id="deliveryTime">
-
-        <label>විශේෂ උපදෙස්</label>
-        <textarea id="notes" rows="2" placeholder="උදා: සැර අඩුවෙන්..."></textarea>
-
         <div class="total-card" id="displayTotal">රු. 0.00</div>
 
         <label>ගෙවීමේ ක්‍රමය</label>
@@ -193,25 +178,35 @@
             <div id="qrInfo" style="display:none;">
                 <img src="https://i.ibb.co/L5YwN6v/30246.jpg" class="qr-img">
             </div>
-            <label style="margin-top:10px;">ගෙවූ Slip පත අප්ලෝඩ් කරන්න</label>
             <input type="file" id="slipInput" accept="image/*" onchange="preview(event)">
             <img id="previewImg">
         </div>
 
-        <button class="btn btn-green" style="font-size: 18px; margin-top: 30px;" onclick="sendOrder()">✅ Confirm Order via WhatsApp</button>
+        <button class="btn btn-green" style="font-size: 18px; margin-top: 30px;" onclick="startRiderSearch()">✅ Confirm Order</button>
+    </div>
+
+    <div id="riderLoader" style="text-align:center;">
+        <span style="font-size: 60px;">🛵</span>
+        <div class="searching-text">Rider කෙනෙක් සොයමින්...</div>
+        <p style="color:#777; font-size:12px;">කරුණාකර මොහොතක් රැඳී සිටින්න</p>
     </div>
 
     <div id="doneSection" style="display:none; text-align:center;">
-        <span style="font-size: 80px;">🚚</span>
-        <h2 style="color: var(--primary);">ඇණවුම යවන ලදී!</h2>
-        <p>ස්තුතියි! WhatsApp හරහා අප සම්බන්ධ වනු ඇත.</p>
-        <button class="btn btn-dark" onclick="location.reload()">මුලට යන්න</button>
+        <div class="rider-found">
+            <h4 style="margin:0; color:var(--dark);">Rider සොයාගන්නා ලදී! ✅</h4>
+            <p id="assignedRider" style="font-weight:600; font-size:18px; color:var(--primary); margin:10px 0;"></p>
+        </div>
+        <h2 style="color: var(--primary); margin-top:20px;">ඇණවුම සාර්ථකයි!</h2>
+        <p>විස්තර WhatsApp හරහා යවන ලදී.</p>
+        <button class="btn btn-dark" onclick="location.reload()">Back to Home</button>
     </div>
 </div>
 
 <script>
     const securePins = ["1997", "1112", "2020"];
+    const riders = ["Navindu 7628", "Sachithra 6388", "Savidu 6399"];
     let quantity = 1;
+    let selectedRider = "";
 
     function closeNotice() {
         document.getElementById('noticeOverlay').style.display = 'none';
@@ -223,74 +218,73 @@
             document.getElementById('lockOverlay').style.display = "none"; 
             document.getElementById('mainApp').style.opacity = "1"; 
             document.getElementById('mainApp').style.pointerEvents = "auto"; 
-        } else { alert("වැරදි PIN අංකයක්!"); } 
+        } else { alert("වැරදි PIN அංකයක්!"); } 
     }
 
     function updateQty(val) { 
         quantity += val; if (quantity < 1) quantity = 1; 
-        document.getElementById('qtyValue').innerText = quantity; 
-        calculateTotal(); 
+        document.getElementById('qtyValue').innerText = quantity; calculateTotal(); 
     }
 
     function calculateTotal() { 
         let f = parseFloat(document.getElementById('food').value) || 0; 
         let a = parseFloat(document.getElementById('area').value) || 0;
-        let total = (f * quantity) + a; 
-        document.getElementById('displayTotal').innerText = "මුළු ගාස්තුව: රු. " + total.toFixed(2); 
+        document.getElementById('displayTotal').innerText = "මුළු ගාස්තුව: රු. " + ((f * quantity) + a).toFixed(2); 
     }
 
     function togglePayment() {
         let m = document.getElementById('payMethod').value;
-        let det = document.getElementById('paymentDetails');
-        det.style.display = m ? 'block' : 'none';
+        document.getElementById('paymentDetails').style.display = m ? 'block' : 'none';
         document.getElementById('bankInfo').style.display = (m === "Online Bank Transfer") ? 'block' : 'none';
         document.getElementById('qrInfo').style.display = (m === "People's Pay QR Scan") ? 'block' : 'none';
     }
 
     function preview(event) {
         let reader = new FileReader();
-        reader.onload = function(){ 
-            let img = document.getElementById('previewImg');
-            img.src = reader.result; img.style.display = "block"; 
-        };
+        reader.onload = function(){ document.getElementById('previewImg').src = reader.result; document.getElementById('previewImg').style.display = "block"; };
         reader.readAsDataURL(event.target.files[0]);
     }
 
     function getLocation() {
         let btn = document.getElementById('locBtn');
-        let bar = document.getElementById('address');
         btn.innerText = "⏳ සොයමින්...";
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((p) => {
-                bar.value = `📍 GPS: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-                bar.style.borderColor = "var(--primary)";
-                btn.innerText = "✅ Location Linked";
-                btn.style.background = "#27ae60";
-            }, (err) => {
-                alert("GPS ලබාගත නොහැක. නැවත වරක් උත්සාහ කරන්න.");
-                btn.innerText = "📍 Get My Location";
-            });
-        }
+        navigator.geolocation.getCurrentPosition((p) => {
+            document.getElementById('address').value = `📍 GPS: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
+            btn.innerText = "✅ Location Linked";
+            btn.style.background = "#27ae60";
+        });
     }
 
-    function sendOrder() {
+    // රයිඩර් සෙවීමේ ඇනිමේෂන් එක
+    function startRiderSearch() {
         let name = document.getElementById('name').value;
         let phone = document.getElementById('phone').value;
-        let pay = document.getElementById('payMethod').value;
-        
-        if(!name || !phone || !pay) { alert("කරුණාකර සියලු විස්තර පුරවන්න."); return; }
+        if(!name || !phone || !document.getElementById('payMethod').value) { alert("කරුණාකර සියලු විස්තර පුරවන්න."); return; }
 
+        document.getElementById('formFields').style.display = 'none';
+        document.getElementById('riderLoader').style.display = 'block';
+
+        // තත්පර 3කට පසු රයිඩර් කෙනෙක් තෝරා පෙන්වීම
+        setTimeout(() => {
+            selectedRider = riders[Math.floor(Math.random() * riders.length)];
+            document.getElementById('assignedRider').innerText = "Rider: " + selectedRider;
+            document.getElementById('riderLoader').style.display = 'none';
+            document.getElementById('doneSection').style.display = 'block';
+            
+            sendToWhatsApp();
+        }, 3500);
+    }
+
+    function sendToWhatsApp() {
+        let name = document.getElementById('name').value;
+        let phone = document.getElementById('phone').value;
         let food = document.getElementById('food').options[document.getElementById('food').selectedIndex].text;
         let area = document.getElementById('area').options[document.getElementById('area').selectedIndex].text;
         let total = document.getElementById('displayTotal').innerText;
-        let notes = document.getElementById('notes').value || "නැත";
         let loc = document.getElementById('address').value || "සඳහන් කර නැත";
 
-        let msg = `*GoFoods Deliver Order*%0A━━━━━━━━━━━━━━━%0A👤 නම: ${name}%0A📞 අංකය: ${phone}%0A🍔 ආහාරය: ${food}%0A🔢 ප්‍රමාණය: ${quantity}%0A📍 ප්‍රදේශය: ${area}%0A💳 ගෙවීම: ${pay}%0A📝 සටහන්: ${notes}%0A💰 ${total}%0A━━━━━━━━━━━━━━━%0A🗺️ Location: ${loc}`;
-        
+        let msg = `*GoFoods New Order*%0A━━━━━━━━━━━━━━━%0A👤 නම: ${name}%0A📞 අංකය: ${phone}%0A🍔 ආහාරය: ${food}%0A🔢 ප්‍රමාණය: ${quantity}%0A📍 ප්‍රදේශය: ${area}%0A💰 ${total}%0A🛵 *Rider: ${selectedRider}*%0A━━━━━━━━━━━━━━━%0A🗺️ Location: ${loc}`;
         window.open(`https://wa.me/94776885969?text=${msg}`, '_blank');
-        document.getElementById('formFields').style.display = 'none';
-        document.getElementById('doneSection').style.display = 'block';
     }
 </script>
 
