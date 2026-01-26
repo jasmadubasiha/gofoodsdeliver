@@ -4,138 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GoFoods Deliver</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #2ecc71;
-            --dark: #1a1a1a;
-            --glass: rgba(255, 255, 255, 0.95);
-        }
-
-        body {
-            font-family: 'Poppins', 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1d2b64 0%, #f8ff00 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            margin: 0;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
-            display: flex; justify-content: center; align-items: center; z-index: 10000;
-        }
-
-        .modal-box {
-            background: white; padding: 35px; border-radius: 30px;
-            text-align: center; width: 85%; max-width: 400px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            animation: fadeInUp 0.5s ease-out;
-        }
-
-        .container {
-            background: var(--glass);
-            padding: 40px; border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            width: 100%; max-width: 480px;
-            animation: fadeInUp 0.7s ease-out;
-        }
-
-        h1 { text-align: center; color: var(--dark); font-weight: 600; margin-bottom: 30px; }
-        h1 span { color: var(--primary); }
-
-        label { font-weight: 600; font-size: 14px; color: #444; display: block; margin-top: 18px; }
+        :root { --primary: #2ecc71; --secondary: #27ae60; --dark: #2c3e50; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; justify-content: center; }
+        .container { background: white; width: 100%; max-width: 450px; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); padding: 20px; position: relative; }
         
-        input, select, textarea {
-            width: 100%; padding: 14px; border: 1.5px solid #ddd; border-radius: 15px;
-            margin-top: 8px; font-size: 15px; transition: 0.3s; box-sizing: border-box;
-        }
-
-        .btn {
-            width: 100%; padding: 16px; border: none; border-radius: 15px;
-            font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s;
-            margin-top: 15px; display: block; text-align: center; text-decoration: none; color: white;
-        }
-
-        .btn-green { background: var(--primary); box-shadow: 0 8px 15px rgba(46, 204, 113, 0.3); }
-        .btn-blue { background: #3498db; }
-        .btn-dark { background: #2c3e50; }
-        .btn-whatsapp { background: #25D366; }
-
-        .qty-row { display: flex; align-items: center; justify-content: space-between; background: #f0f0f0; padding: 10px 20px; border-radius: 15px; margin-top: 10px; }
-        .qty-btn { background: var(--primary); color: white; border: none; width: 35px; height: 35px; border-radius: 10px; font-size: 20px; cursor: pointer; }
+        /* Login Overlay */
+        #loginOverlay { position: fixed; inset: 0; background: white; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center; }
+        .logo { font-size: 32px; font-weight: bold; color: var(--primary); margin-bottom: 20px; }
         
-        .total-card {
-            background: var(--dark); color: var(--primary);
-            padding: 20px; border-radius: 20px; text-align: center;
-            font-size: 24px; font-weight: 600; margin-top: 30px; border: 2px solid var(--primary);
-        }
+        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; margin-top: 10px; color: white; }
+        .btn-primary { background: var(--primary); }
+        .btn-primary:hover { background: var(--secondary); }
 
-        #paymentDetails { display: none; margin-top: 20px; padding: 20px; background: #fff; border: 1px dashed var(--primary); border-radius: 15px; text-align: center; }
-        .qr-img { width: 100%; max-width: 200px; border-radius: 15px; margin: 10px 0; }
-        #previewImg { width: 100%; border-radius: 15px; margin-top: 10px; display: none; }
+        /* Card Animation Overlay */
+        #paymentProcessing { position: fixed; inset: 0; background: rgba(255,255,255,0.95); z-index: 10001; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .loader { border: 5px solid #f3f3f3; border-top: 5px solid var(--primary); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Rider Animation Styles */
-        #riderLoader { display: none; }
-        .searching-text { font-size: 18px; color: var(--primary); font-weight: 600; animation: pulse 1.5s infinite; margin-top: 15px; }
-        .rider-found { background: #e8f5e9; padding: 15px; border-radius: 15px; margin-top: 15px; border: 1px solid var(--primary); }
-
-        #mainApp { opacity: 0; pointer-events: none; transition: 0.5s; }
+        .card-box { border: 1px solid #eee; padding: 15px; border-radius: 15px; background: #fafafa; display: none; margin-top: 10px; }
+        .total-banner { background: var(--dark); color: white; padding: 20px; border-radius: 15px; text-align: center; margin: 20px 0; font-size: 22px; font-weight: bold; }
+        #mainApp { display: none; }
     </style>
 </head>
 <body>
 
-<div id="noticeOverlay" class="overlay">
-    <div class="modal-box">
-        <h2>GoFoods Deliver</h2>
-        <span style="font-size: 50px; display:block; margin:15px 0;">📍</span>
-        <h3>සේවා ප්‍රදේශයන්</h3>
-        <p style="color: #666; font-size: 14px;">අම්බලන්තොට, මාමඩල, නෝනගම, හැඩවින්න, බරවකුඹුක, බැමිනියන්විල ප්‍රදේශවලට පමණක් ඇනවුම් බාරගනු ලැබේ.</p>
-        <button class="btn btn-green" onclick="closeNotice()">පිළිගන්නවා (OK)</button>
-    </div>
+<div id="loginOverlay">
+    <div class="logo">GoFoods Deliver</div>
+    <p>නම සහ දුරකථන අංකය ඇතුළත් කර Location ලබා දී ඇතුල් වන්න.</p>
+    <input type="text" id="loginName" placeholder="ඔබේ නම">
+    <input type="tel" id="loginPhone" placeholder="දුරකථන අංකය (07xxxxxxxx)" maxlength="10">
+    <button class="btn btn-primary" onclick="attemptLogin()">Login & Get Location 📍</button>
 </div>
 
-<div id="lockOverlay" class="overlay" style="display:none;">
-    <div class="modal-box">
-        <h2>GoFoods Deliver</h2>
-        <p style="color: #888; font-size: 13px;">සේවාව Unlock කිරීමට PIN අංකය ඇතුළත් කරන්න.</p>
-        <a href="https://wa.me/94776885969?text=Pin%20number" target="_blank" class="btn btn-whatsapp">📩 Get PIN via WhatsApp</a>
-        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-        <input type="password" id="entryPin" placeholder="••••" style="text-align: center; font-size: 24px; letter-spacing: 10px;">
-        <button class="btn btn-green" onclick="unlockSite()">Unlock Now</button>
-    </div>
+<div id="paymentProcessing">
+    <div class="loader"></div>
+    <h3 id="processText">Connecting to Bank...</h3>
 </div>
 
 <div class="container" id="mainApp">
-    <h1>GoFoods <span>Deliver</span></h1>
+    <h2 style="color:var(--primary); text-align:center;">GoFoods Deliver</h2>
     
-    <div id="formFields">
-        <label>ඔබේ නම</label>
-        <input type="text" id="name" placeholder="නම ඇතුළත් කරන්න">
+    <div id="orderForm">
+        <label>ස්ථානය තහවුරුයි ✅</label>
+        <input type="text" id="finalLocationDisplay" value="GPS Location Captured" readonly style="font-size: 12px; color: #27ae60; font-weight: bold;">
 
-        <label>දුරකථන අංකය</label>
-        <input type="tel" id="phone" placeholder="07xxxxxxxx">
-        
-        <label>ස්ථානය (GPS Location)</label>
-        <button type="button" id="locBtn" class="btn btn-blue" onclick="getLocation()">📍 Get My Location</button>
-        <input type="text" id="address" placeholder="Location මෙහි දිස්වේ" readonly>
-
-        <label>ආහාර වර්ගය</label>
-        <select id="food" onchange="calculateTotal()">
+        <label>ආහාර වර්ගය:</label>
+        <select id="foodItem" onchange="calcTotal()">
             <option value="0">-- තෝරන්න --</option>
             <option value="1100">චිකන් රයිස් - රු. 1100</option>
             <option value="1400">මික්ස් රයිස් - රු. 1400</option>
@@ -143,152 +59,116 @@
             <option value="500">චිකන් රයිස් (Normal) - රු. 500</option>
         </select>
 
-        <label>ප්‍රමාණය (Quantity)</label>
-        <div class="qty-row">
-            <button class="qty-btn" onclick="updateQty(-1)">−</button>
-            <span id="qtyValue" style="font-weight: 600; font-size: 18px;">1</span>
-            <button class="qty-btn" onclick="updateQty(1)">+</button>
-        </div>
+        <label>ප්‍රමාණය (Quantity):</label>
+        <input type="number" id="qty" value="1" min="1" onchange="calcTotal()">
 
-        <label>ප්‍රදේශය (Delivery Area)</label>
-        <select id="area" onchange="calculateTotal()">
+        <label>ප්‍රදේශය:</label>
+        <select id="area" onchange="calcTotal()">
             <option value="0">-- තෝරන්න --</option>
-            <option value="200">අම්බලන්තොට (200)</option>
             <option value="300">මාමඩල (300)</option>
-            <option value="200">නෝනගම (200)</option>
             <option value="400">හැඩවින්න (400)</option>
-            <option value="450">බරවකුඹුක (450)</option>
-            <option value="350">බැමිනියන්විල (350)</option>
+            <option value="250">වලේවත්ත (250)</option>
+            <option value="200">නෝනගම (200)</option>
         </select>
 
-        <div class="total-card" id="displayTotal">රු. 0.00</div>
+        <div class="total-banner" id="totalDisplay">මුළු ගාස්තුව: රු. 0.00</div>
 
-        <label>ගෙවීමේ ක්‍රමය</label>
-        <select id="payMethod" onchange="togglePayment()">
+        <label>ගෙවීමේ ක්‍රමය:</label>
+        <select id="payMethod" onchange="togglePayFields()">
             <option value="">-- තෝරන්න --</option>
-            <option value="Online Bank Transfer">Online Bank Transfer</option>
-            <option value="People's Pay QR Scan">People's Pay QR Scan</option>
+            <option value="Card">Visa / Master Card</option>
+            <option value="QR">People's Pay QR</option>
+            <option value="Bank">Bank Transfer</option>
         </select>
 
-        <div id="paymentDetails">
-            <div id="bankInfo" style="display:none;">
-                <p style="font-weight:bold; color:var(--primary);">People's Bank</p>
-                <p style="font-size:14px;">Acc: 072200170040756<br>Name: Sachi foods</p>
+        <div id="cardBox" class="card-box">
+            <input type="text" placeholder="Card Number" maxlength="16">
+            <div style="display:flex; gap:10px;">
+                <input type="text" placeholder="MM/YY" maxlength="5">
+                <input type="password" placeholder="CVV" maxlength="3">
             </div>
-            <div id="qrInfo" style="display:none;">
-                <img src="<a href="https://imgbb.com/"><img src="https://i.ibb.co/YFy2wkRZ/IMG-20260121-WA0000.jpg" alt="IMG-20260121-WA0000" border="0" /></a>" class="qr-img">
-            </div>
-            <label style="margin-top:10px;">ගෙවූ Slip පත අප්ලෝඩ් කරන්න</label>
-            <input type="file" id="slipInput" accept="image/*" onchange="preview(event)">
-            <img id="previewImg">
+            <button class="btn btn-primary" onclick="simulateCardPay()">Pay Securely</button>
         </div>
 
-        <button class="btn btn-green" style="font-size: 18px; margin-top: 30px;" onclick="startRiderSearch()">✅ Confirm Order</button>
-    </div>
-
-    <div id="riderLoader" style="text-align:center;">
-        <span style="font-size: 60px;">🛵</span>
-        <div class="searching-text">Rider කෙනෙක් සොයමින්...</div>
-        <p style="color:#777; font-size:12px;">කරුණාකර මොහොතක් රැඳී සිටින්න</p>
-    </div>
-
-    <div id="doneSection" style="display:none; text-align:center;">
-        <div class="rider-found">
-            <h4 style="margin:0; color:var(--dark);">Rider සොයාගන්නා ලදී! ✅</h4>
-            <p id="assignedRider" style="font-weight:600; font-size:18px; color:var(--primary); margin:10px 0;"></p>
+        <div id="qrBox" class="card-box" style="text-align:center;">
+            <img src="https://i.ibb.co/L5YwN6v/30246.jpg" width="180">
+            <button class="btn btn-primary" onclick="showConfirmBtn()">I Paid</button>
         </div>
-        <h2 style="color: var(--primary); margin-top:20px;">ඇණවුම සාර්ථකයි!</h2>
-        <p>විස්තර WhatsApp හරහා යවන ලදී.</p>
-        <button class="btn btn-dark" onclick="location.reload()">මුලට යන්න</button>
+
+        <div id="bankBox" class="card-box">
+            <p>People's Bank | Acc: 072200170040756</p>
+            <button class="btn btn-primary" onclick="showConfirmBtn()">Payment Done</button>
+        </div>
+
+        <div id="confirmBox" style="display:none; margin-top:20px;">
+            <button class="btn btn-primary" style="background:var(--dark);" onclick="finalOrder()">Confirm Final Order</button>
+        </div>
+    </div>
+
+    <div id="successPage" style="display:none; text-align:center; padding:40px 0;">
+        <h1 style="color:var(--primary);">✅ සාර්ථකයි!</h1>
+        <p>ඔබගේ ඇනවුම යොමු කරන ලදී.</p>
+        <button class="btn btn-primary" onclick="location.reload()">Back to Home</button>
     </div>
 </div>
 
 <script>
-    const securePins = ["1997", "1112", "2020"];
-    const riders = ["Navindu 7628", "Sachithra 6388", "Savidu 6399"];
-    let quantity = 1;
-    let selectedRider = "";
+    let userLocation = "";
 
-    function closeNotice() {
-        document.getElementById('noticeOverlay').style.display = 'none';
-        document.getElementById('lockOverlay').style.display = 'flex';
+    function attemptLogin() {
+        const name = document.getElementById('loginName').value;
+        const phone = document.getElementById('loginPhone').value;
+        if(!name || phone.length < 10) { alert("විස්තර නිවැරදිව ඇතුළත් කරන්න."); return; }
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((p) => {
+                userLocation = `https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
+                document.getElementById('loginOverlay').style.display = "none";
+                document.getElementById('mainApp').style.display = "block";
+            }, () => { alert("Location ලබා දීම අනිවාර්ය වේ."); });
+        }
     }
 
-    function unlockSite() { 
-        if (securePins.includes(document.getElementById('entryPin').value)) { 
-            document.getElementById('lockOverlay').style.display = "none"; 
-            document.getElementById('mainApp').style.opacity = "1"; 
-            document.getElementById('mainApp').style.pointerEvents = "auto"; 
-        } else { alert("වැරදි PIN අංකයක්!"); } 
+    function calcTotal() {
+        let food = parseFloat(document.getElementById('foodItem').value) || 0;
+        let qty = parseInt(document.getElementById('qty').value) || 1;
+        let area = parseFloat(document.getElementById('area').value) || 0;
+        document.getElementById('totalDisplay').innerText = `මුළු ගාස්තුව: රු. ${(food * qty) + area}.00`;
     }
 
-    function updateQty(val) { 
-        quantity += val; if (quantity < 1) quantity = 1; 
-        document.getElementById('qtyValue').innerText = quantity; calculateTotal(); 
+    function togglePayFields() {
+        const method = document.getElementById('payMethod').value;
+        document.getElementById('cardBox').style.display = (method === 'Card') ? 'block' : 'none';
+        document.getElementById('qrBox').style.display = (method === 'QR') ? 'block' : 'none';
+        document.getElementById('bankBox').style.display = (method === 'Bank') ? 'block' : 'none';
+        document.getElementById('confirmBox').style.display = 'none';
     }
 
-    function calculateTotal() { 
-        let f = parseFloat(document.getElementById('food').value) || 0; 
-        let a = parseFloat(document.getElementById('area').value) || 0;
-        document.getElementById('displayTotal').innerText = "මුළු ගාස්තුව: රු. " + ((f * quantity) + a).toFixed(2); 
+    function simulateCardPay() {
+        document.getElementById('paymentProcessing').style.display = 'flex';
+        setTimeout(() => { 
+            document.getElementById('paymentProcessing').style.display = 'none';
+            showConfirmBtn();
+        }, 3000);
     }
 
-    function togglePayment() {
-        let m = document.getElementById('payMethod').value;
-        document.getElementById('paymentDetails').style.display = m ? 'block' : 'none';
-        document.getElementById('bankInfo').style.display = (m === "Online Bank Transfer") ? 'block' : 'none';
-        document.getElementById('qrInfo').style.display = (m === "People's Pay QR Scan") ? 'block' : 'none';
+    function showConfirmBtn() {
+        document.getElementById('confirmBox').style.display = 'block';
     }
 
-    function preview(event) {
-        let reader = new FileReader();
-        reader.onload = function(){ document.getElementById('previewImg').src = reader.result; document.getElementById('previewImg').style.display = "block"; };
-        reader.readAsDataURL(event.target.files[0]);
-    }
-
-    function getLocation() {
-        let btn = document.getElementById('locBtn');
-        btn.innerText = "⏳ සොයමින්...";
-        navigator.geolocation.getCurrentPosition((p) => {
-            document.getElementById('address').value = `📍 GPS: https://www.google.com/maps?q=${p.coords.latitude},${p.coords.longitude}`;
-            btn.innerText = "✅ Location Linked";
-            btn.style.background = "#27ae60";
-        }, (err) => {
-            alert("Location ලබාගත නොහැක.");
-            btn.innerText = "📍 Get My Location";
-        });
-    }
-
-    function startRiderSearch() {
-        let name = document.getElementById('name').value;
-        let phone = document.getElementById('phone').value;
-        if(!name || !phone || !document.getElementById('payMethod').value) { alert("කරුණාකර සියලු විස්තර පුරවන්න."); return; }
-
-        document.getElementById('formFields').style.display = 'none';
-        document.getElementById('riderLoader').style.display = 'block';
-
-        setTimeout(() => {
-            selectedRider = riders[Math.floor(Math.random() * riders.length)];
-            document.getElementById('assignedRider').innerText = "Rider: " + selectedRider;
-            document.getElementById('riderLoader').style.display = 'none';
-            document.getElementById('doneSection').style.display = 'block';
-            sendToWhatsApp();
-        }, 3500);
-    }
-
-    function sendToWhatsApp() {
-        let name = document.getElementById('name').value;
-        let phone = document.getElementById('phone').value;
-        let food = document.getElementById('food').options[document.getElementById('food').selectedIndex].text;
-        let area = document.getElementById('area').options[document.getElementById('area').selectedIndex].text;
-        let total = document.getElementById('displayTotal').innerText;
-        let loc = document.getElementById('address').value || "සඳහන් කර නැත";
-
-        let msg = `*GoFoods New Order*%0A━━━━━━━━━━━━━━━%0A👤 නම: ${name}%0A📞 අංකය: ${phone}%0A🍔 ආහාරය: ${food}%0A🔢 ප්‍රමාණය: ${quantity}%0A📍 ප්‍රදේශය: ${area}%0A💰 ${total}%0A🛵 *Rider: ${selectedRider}*%0A━━━━━━━━━━━━━━━%0A🗺️ Location: ${loc}`;
-        window.open(`https://wa.me/94776885969?text=${msg}`, '_blank');
+    function finalOrder() {
+        const name = document.getElementById('loginName').value;
+        const phone = document.getElementById('loginPhone').value;
+        const food = document.getElementById('foodItem').options[document.getElementById('foodItem').selectedIndex].text;
+        const total = document.getElementById('totalDisplay').innerText;
+        const method = document.getElementById('payMethod').value;
+        
+        const finalMsg = `*GOFOODS NEW ORDER*%0AClient: ${name}%0APhone: ${phone}%0AOrder: ${food}%0APayment: ${method}%0A${total}%0ALocation: ${userLocation}`;
+        
+        window.open(`https://wa.me/94776885969?text=${finalMsg}`, '_blank');
+        document.getElementById('orderForm').style.display = 'none';
+        document.getElementById('successPage').style.display = 'block';
     }
 </script>
-
 </body>
 </html>
-
